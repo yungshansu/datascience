@@ -20,13 +20,14 @@ class Crawl_ptt_beauty():
             "https://www.ptt.cc/bbs/Beauty/M.1510829546.A.D83.html",
             "https://www.ptt.cc/bbs/Beauty/M.1512141143.A.D31.html"]
 
+
     def crawl(self):
         article_file = open(self.all_article_file_name, "w")
         popular_file = open(self.all_popular_file_name, "w")
         year = 2016
         last_date = 10000
         while year < 2018:
-            sleep(0.5)
+            sleep(0.01)
             url = "https://www.ptt.cc/bbs/Beauty/index" + \
                 str(self.start_crawl_url_index) + ".html"
             r = requests.get(url)
@@ -106,12 +107,13 @@ class Crawl_ptt_beauty():
         boo = {}
         boo_number = 0
         for article_description in article_descriptions:
-            sleep(0.5)
+
             date = article_description.split(",", 1)[0]
             url = article_description.rsplit(",", 1)[1]
             date = int(date)
             if date >= int(start_date) and date <= int(end_date):
                 print (date)
+                sleep(0.01)
                 r = requests.get(url.split("\n")[0])
                 content = r.text
                 soup = BeautifulSoup(content, 'html.parser')
@@ -194,13 +196,13 @@ class Crawl_ptt_beauty():
         popular_number = 0
         image_url_list = []
         for popular_description in popular_descriptions:
-            sleep(0.5)
             date = popular_description.split(",", 1)[0]
             url = popular_description.rsplit(",", 1)[1]
             date = int(date)
             if date >= int(start_date) and date <= int(end_date):
                 popular_number = popular_number + 1
                 print (date)
+                sleep(0.01)
                 r = requests.get(url.split("\n")[0])
                 content = r.text
                 soup = BeautifulSoup(content, 'html.parser')
@@ -225,16 +227,52 @@ class Crawl_ptt_beauty():
     def find_article(self, search_key, start_date, end_date):
         article_file = open(self.all_article_file_name, "r")
         article_descriptions = article_file.readlines()
+        keyword_file_name = "keyword(" + search_key + ")[" + start_date + "-" \
+            + end_date + "].txt"
+        keyword_file = open(keyword_file_name, "w")
         for article_description in article_descriptions:
-            sleep(0.5)
             date = article_description.split(",", 1)[0]
             url = article_description.rsplit(",", 1)[1]
             date = int(date)
+            keywords = []
+            image_url_list = []
             if date >= int(start_date) and date <= int(end_date):
                 print (date)
+                sleep(0.01)
                 r = requests.get(url.split("\n")[0])
                 content = r.text
+                # print (content)
                 soup = BeautifulSoup(content, 'html.parser')
-                description = soup.find('div', {'id': "main-container"})
-                print (description)
-                break
+                description = soup.find('div', {'id': "main-content"})
+                title_tags = description.findAll('span',{'class':\
+                    "article-meta-tag"})
+                title_values = description.findAll('span',{'class':\
+                    "article-meta-value"})
+                for title_tag in title_tags:
+                    keywords.append(title_tag.text)
+                for title_value in title_values:
+                    keywords.append(title_value.text)
+
+                article = description.text.split("※ 發信站: 批踢踢實業坊(ptt.cc)"\
+                    )[0]
+                keywords.append(article)
+                has_search_key = False
+                for keyword in keywords:
+                    if search_key in keyword:
+                        has_search_key = True
+                        break
+                if has_search_key:
+                    for link in soup.findAll('a'):
+                        link = link.get('href')
+                        if link == None:
+                            continue
+                        if link.endswith(".png"):
+                            image_url_list.append(link)
+                        elif link.endswith(".jpg"):
+                            image_url_list.append(link)
+                        elif link.endswith(".jpeg"):
+                            image_url_list.append(link)
+                        elif link.endswith(".gif"):
+                            image_url_list.append(link)
+            for image_url in image_url_list:
+                keyword_file.write(image_url + "\n")
