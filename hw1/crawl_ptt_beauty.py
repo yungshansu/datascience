@@ -63,8 +63,8 @@ class Crawl_ptt_beauty():
             for article in articles:
                 if str(article).find("本文已被刪除") > 0:
                     continue
-                if str(article).find("[公告]") > 0:
-                    continue
+                # if str(article).find("[公告]") > 0:
+                #     continue
                 title_element = article.find('div', {'class': "title"})
                 if len(title_element) < 1:
                     continue
@@ -72,7 +72,8 @@ class Crawl_ptt_beauty():
                     title_element = title_element.find('a')
                 if title_element is None:
                     continue
-
+                if title_element.text.find("[公告]") == 0:
+                    continue
 
                 date = article.findAll('div', {'class': "date"})[0].text
                 date = date.replace(" ", "").replace("/", "")
@@ -106,7 +107,7 @@ class Crawl_ptt_beauty():
 
                 last_date = int(date)
             self.start_crawl_url_index = self.start_crawl_url_index + 1
-            print (self.start_crawl_url_index)
+            print ("Index: " + str(self.start_crawl_url_index))
 
 
     def get_article_year(self, url):
