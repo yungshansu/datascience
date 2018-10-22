@@ -1,4 +1,4 @@
 all:main.cpp
-	g++ -std=c++11 main.cpp -o main.out
+	g++ -std=c++11 main.cpp -o main.exe
 clean:
-	rm -f main.out
+	rm -f main.exe
