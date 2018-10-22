@@ -1,0 +1,12 @@
+All of used header file is standard C++ library:
+<iostream>
+<fstream>
+<cstdio>
+<sstream>
+<string>
+<cstdlib>
+<vector>
+<list>
+<algorithm>
+<iterator>
+<map>
